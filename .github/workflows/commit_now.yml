@@ -20,10 +20,6 @@ on:
         required: true
         default: '5'
 
-  push:
-    branches:
-      - master
-
 permissions:
   contents: write
 
@@ -40,35 +36,22 @@ jobs:
 
       - name: Set Config & First Commit
         run: |
-          git config user.email "${{ github.event.inputs.email || 'rakkaevandra@gmail.com' }}"
-          git config user.name "${{ github.event.inputs.username || 'RakkaEvandra06' }}"
+          git config user.email "${{ github.event.inputs.email }}"
+          git config user.name "${{ github.event.inputs.username }}"
 
-          git add -A
-
-          arr[0]="chore(bot): 🥶 auto commit"
-          arr[1]="chore(bot): 😱 auto commit"
-          arr[2]="chore(bot): 🥵 auto commit"
-          arr[3]="chore(bot): 🗿 auto commit"
-          arr[4]="chore(bot): 👻 auto commit"
-
-          rand=$((RANDOM % ${#arr[@]}))
-
-          git diff --cached --quiet || git commit -m "${arr[$rand]}"
-
-      - name: DO It
+      - name: Perform sequential commits
         run: |
-          LIMIT=${{ github.event.inputs.limit || 5 }}
+          LIMIT=${{ github.event.inputs.limit }}
 
-          for ((i=0; i<=LIMIT; i++))
+          for ((i=1; i<=LIMIT; i++))
           do
-            d="$i-$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-            echo "$d" > LAST_UPDATED
+            echo "$i-$(date -u '+%Y-%m-%dT%H:%M:%SZ')" > LAST_UPDATED
 
             git add -A
-            git commit -m "${{ github.event.inputs.commit || 'Penghijauan' }}" || true
+            git commit -m "${{ github.event.inputs.commit }}" || true
           done
 
-      - name: Push
+      - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
